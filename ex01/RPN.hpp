@@ -1,38 +1,33 @@
 #ifndef RPN_HPP
-# define RPN_HPP
+#define RPN_HPP
 
-# include <cstdlib>
-# include <iostream>
-# include <string>
-# include <cctype>
-
-# include <stack>
+#include <cstdlib>
+#include <iostream>
+#include <string>
+#include <cctype>
+#include <stack>
+#include <sstream>
 
 class RPN
 {
-	private:
-		std::stack<int> _stck;
+private:
+	std::stack<int> _stck;
 
-		void clearStck();
+	void clearStack();
+	bool isOperator(const std::string &token);
+	int calculateOperation(const std::string &operation);
 
-	public:
-		RPN();
-		RPN(char *data);
-		RPN(RPN const &other);
-		RPN &operator=(RPN const &other);
-		virtual ~RPN();
+public:
+	RPN();
+	RPN(const std::string &data);
+	RPN(const RPN &other);
+	RPN &operator=(const RPN &other);
+	virtual ~RPN();
 
-		int calculator(char *data);
-		int validate(char *token);
-
-		int addition();
-		int subtraction();
-		int multiplication();
-		int division();
-
-		std::stack<int> getInfo() const;
+	int calculator(const std::string &data);
+	std::stack<int> getInfo() const;
 };
 
-std::ostream& operator << (std::ostream &out, const RPN &rpn);
+std::ostream& operator<<(std::ostream &out, const RPN &rpn);
 
 #endif

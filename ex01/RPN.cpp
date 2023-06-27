@@ -2,182 +2,104 @@
 
 RPN::RPN() { }
 
-RPN::RPN(char *data)
+RPN::RPN(const std::string &data)
 {
-	char *token = std::strtok(data, " ");
-
-	while (token != NULL)
-	{
-		if (this->calculator(token))
-		{
-			this->clearStck();
-			return ;
-		}
-		token = std::strtok(NULL, " ");
-	}
+    std::istringstream iss(data);
+    std::string token;
+    
+    while (iss >> token)
+    {
+        if (this->calculator(token)) 
+        {
+            this->clearStack();
+            return;
+        }
+    }
 }
 
-RPN::RPN(RPN const &other)
+RPN::RPN(const RPN &other)
 {
-	*this = other;
+    *this = other;
 }
 
-RPN &RPN::operator=(RPN const &other)
+RPN &RPN::operator=(const RPN &other)
 {
-	if (this != &other)
-	{
-		this->_stck = other.getInfo();
-	}
-	return (*this);
+    if (this != &other)
+    {
+        this->_stck = other.getInfo();
+    }
+    return *this;
 }
 
 RPN::~RPN() { }
 
-int RPN::calculator(char *data)
+int RPN::calculator(const std::string &data)
 {
-	int err = 0;
-
-	// Validate element.
-	if (this->validate(data))
-	{
-		this->clearStck();
-		return (1);
-	}
-	
-	// Choose operation.
-	char element = data[0];
-	if (element == '+')
-		err = this->addition();
-	else if (element == '-')
-		err = this->subtraction();
-	else if (element == '*')
-		err = this->multiplication();
-	else if (element == '/')
-		err = this->division();
-	else
-		this->_stck.push(atoi(data));
-
-	// Manage operator errors.
-	if (err != 0)
-	{
-		this->clearStck();
-		return (1);
-	}
-
-	return (0);
+    try {
+        if (!isOperator(data)) {
+            this->_stck.push(std::stoi(data));
+            return 0;
+        }
+    } catch (const std::invalid_argument& ia) {
+        return 1;
+    }
+    
+    return this->calculateOperation(data);
 }
 
-int RPN::validate(char *token)
+bool RPN::isOperator(const std::string &token)
 {
-	char c;
-	if(strlen(token) > 1)
-		return (1);
-	c = token[0];
-	if ((c < '0' || c > '9') && (c != '+' && c != '-' && c != '*' && c != '/'))
-		return (1);
-	return (0);
+    return token.length() == 1 && (token[0] == '+' || token[0] == '-' || token[0] == '*' || token[0] == '/');
 }
 
-int RPN::addition()
+int RPN::calculateOperation(const std::string &operation)
 {
-	int first;
-	int last;
+    if (_stck.size() < 2)
+        return 1;
 
-	// Checking valid number of elements to operate.
-	if (this->_stck.size() < 2)
-		return (1);
+    int last = _stck.top();
+    _stck.pop();
+    int first = _stck.top();
+    _stck.pop();
 
-	last = this->_stck.top();
-	this->_stck.pop();
-	first = this->_stck.top();
-	this->_stck.pop();
-	this->_stck.push(first + last);
-	return (0);
+    if(operation == "+") 
+        _stck.push(first + last); 
+    else if(operation == "-") 
+        _stck.push(first - last);
+    else if(operation == "*") 
+        _stck.push(first * last); 
+    else if(operation == "/") {
+        if (last == 0)
+            return 1;
+        _stck.push(first / last); 
+    }
+    else 
+        return 1;
+
+    return 0;
 }
 
-int RPN::subtraction()
+void RPN::clearStack()
 {
-	int first;
-	int last;
-
-	// Checking valid number of elements to operate.
-	if (this->_stck.size() < 2)
-		return (1);
-
-	last = this->_stck.top();
-	this->_stck.pop();
-	first = this->_stck.top();
-	this->_stck.pop();
-	this->_stck.push(first - last);
-	return (0);
-}
-
-int RPN::multiplication()
-{
-	int first;
-	int last;
-
-	// Checking valid number of elements to operate.
-	if (this->_stck.size() < 2)
-		return (1);
-
-	last = this->_stck.top();
-	this->_stck.pop();
-	first = this->_stck.top();
-	this->_stck.pop();
-	this->_stck.push(first * last);
-	return (0);
-}
-
-int RPN::division()
-{
-	int first;
-	int last;
-
-	// Checking valid number of elements to operate.
-	if (this->_stck.size() < 2)
-		return (1);
-
-	last = this->_stck.top();
-	this->_stck.pop();
-	first = this->_stck.top();
-	this->_stck.pop();
-
-	// Checking for indertemination in division.
-	if (last == 0)
-		return (1);
-
-	this->_stck.push(first / last);
-	return (0);
+    while (!_stck.empty())
+        _stck.pop();
 }
 
 std::stack<int> RPN::getInfo() const
 {
-	return (this->_stck);
+    return _stck;
 }
 
-void RPN::clearStck()
+std::ostream& operator<<(std::ostream &out, const RPN &rpn)
 {
-	while (!this->_stck.empty())
-		this->_stck.pop();
-	return ;
-}
+    std::stack<int> aux = rpn.getInfo();
 
-std::ostream& operator << (std::ostream &out, const RPN &rpn)
-{
-	std::stack<int> aux = rpn.getInfo();
-
-	if (!aux.empty())
-	{
-		if  (aux.size() > 1)
-			out << "Error";
-		while (!aux.empty())
-		{
-			out << aux.top();
-			aux.pop();
-		}
-	}
-	else
-		out << "Error";
-	return (out);
+    if (aux.empty())
+        out << "Error";
+    else if (aux.size() > 1)
+        out << "Error";
+    else
+        out << aux.top();
+    
+    return out;
 }
