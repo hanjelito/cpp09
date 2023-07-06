@@ -17,15 +17,21 @@ void PmergeMe::run() {
     double vector_time, list_time;
 
     std::cout << "Before:";
-    std::copy(input_.begin(), input_.end(), std::ostream_iterator<int>(std::cout, " "));
+    for (int i = 0; i < input_.size(); ++i) {
+        std::cout << " " << input_[i];
+    }
     std::cout << std::endl;
 
     std::vector<int> sorted_vector = sortVector(vector_time);
     std::list<int> sorted_list = sortList(list_time);
 
+
     std::cout << "After:";
-    std::copy(sorted_vector.begin(), sorted_vector.end(), std::ostream_iterator<int>(std::cout, " "));
+    for (int i = 0; i < sorted_vector.size(); ++i) {
+        std::cout << " " << sorted_vector[i];
+    }
     std::cout << std::endl;
+
 
     std::cout << std::fixed << std::setprecision(5);
     std::cout << "Time to process a range of " << input_.size() << " elements with std::vector: " 
@@ -43,7 +49,7 @@ std::vector<int> PmergeMe::sortVector(double& elapsed_time) {
         std::copy_backward(it, sorted_vector.begin() + i, sorted_vector.begin() + i + 1);
         *it = input_[i];
     }
-
+ 
     clock_t vector_sort_time = clock() - start_time;
     elapsed_time = (double)vector_sort_time / CLOCKS_PER_SEC * 1000;
 
