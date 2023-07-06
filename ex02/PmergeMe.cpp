@@ -29,9 +29,9 @@ void PmergeMe::run() {
 
     std::cout << std::fixed << std::setprecision(5);
     std::cout << "Time to process a range of " << input_.size() << " elements with std::vector: " 
-            << vector_time << " microseconds" << std::endl;
+            << vector_time << " us" << std::endl;
     std::cout << "Time to process a range of " << input_.size() << " elements with std::list: " 
-            << list_time << " microseconds" << std::endl;
+            << list_time << " us" << std::endl;
 }
 
 std::vector<int> PmergeMe::sortVector(double& elapsed_time) {
@@ -45,7 +45,7 @@ std::vector<int> PmergeMe::sortVector(double& elapsed_time) {
     }
 
     clock_t vector_sort_time = clock() - start_time;
-    elapsed_time = (double)vector_sort_time / CLOCKS_PER_SEC * 10;
+    elapsed_time = (double)vector_sort_time / CLOCKS_PER_SEC * 1000;
 
     return sorted_vector;
 }
@@ -60,7 +60,7 @@ std::list<int> PmergeMe::sortList(double& elapsed_time) {
     }
 
     clock_t list_sort_time = clock() - start_time;
-    elapsed_time = (double)list_sort_time / CLOCKS_PER_SEC * 10;
+    elapsed_time = (double)list_sort_time / CLOCKS_PER_SEC * 1000;
 
     return sorted_list;
 }
