@@ -8,6 +8,7 @@
 #include <iomanip>
 #include <vector>
 #include <list>
+#include <ctime>
 #include <sstream>
 
 class PmergeMe {
@@ -16,6 +17,10 @@ private:
     std::vector<int> sortVector(double& elapsed_time);
     std::list<int> sortList(double& elapsed_time);
 
+    //merge y mergeSort
+    void merge(std::vector<int>& arr, int left, int mid, int right);
+    void mergeSort(std::vector<int>& arr, int left, int right);
+
 public:
     PmergeMe(const std::vector<int>& input);
     PmergeMe(const PmergeMe& other);
@@ -23,6 +28,8 @@ public:
     ~PmergeMe();
 
     void run();
-
 };
+
 #endif
+
+// ./PmergeMe `jot -r 3000 1 100000 | tr '\n' ' '`
